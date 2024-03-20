@@ -1,5 +1,5 @@
 const path = require("path");
-
+const Vocab = require("../models/Vocab");
 const vocab = [];
 
 exports.getAddVocab = (req, res, next) => {
@@ -7,16 +7,17 @@ exports.getAddVocab = (req, res, next) => {
 };
 
 exports.postAddVocab = (req, res, next) => {
-  vocab.push({ title: req.body.title });
-  res.redirect('/showcase');
+  const vocab = new Vocab(req.body.title);
+  vocab.save();
+  res.redirect("/showcase");
 };
 
 exports.getShowcase = (req, res, next) => {
-    res.render('showcase', {
-        vocabs: vocab,
-        pageTitle: 'showcase',
-        path: '/showcase',
-      });
+  res.render("showcase", {
+    vocabs: Vocab.fetchAll(),
+    pageTitle: "showcase",
+    path: "/showcase",
+  });
 };
 
 exports.vocab = vocab;
