@@ -5,11 +5,13 @@ const bodyParser = require("body-parser");
 const memberRoutes = require("./routes/member")
 const showcaseRoutes = require("./routes/showcase")
 
-
 const app = express();
 
+app.set('view engine', 'ejs');
+app.set('views', 'views');
+
 app.use(bodyParser.urlencoded());
-// app.js
+
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use('/member', memberRoutes);

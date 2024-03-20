@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Showcase</title>
+  </head>
+
+  <body>
+    <header>
+      <nav>
+        <ul>
+          <li><a href="/showcase">Showcase</a></li>
+          <li><a href="/member/add-vocab">Add Vocab</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <h1>My Vocab</h1>
+      <p>List of all the vocab...</p>
+    </main>
+
+    <main>
+      <% if (vocabs.length > 0) { %>
+      <div class="grid">
+        <% for (let vocab of vocabs) { %>
+        <article class="card vocab-item">
+          <header class="card__header">
+            <h1 class="vocab__title"><%= vocab.title %></h1>
+          </header>
+        </article>
+        <% } %>
+      </div>
+      <% } else { %>
+      <h1>No Vocab Found!</h1>
+      <% } %>
+    </main>
+  </body>
+</html>
