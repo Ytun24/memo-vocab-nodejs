@@ -20,4 +20,9 @@ exports.getShowcase = (req, res, next) => {
   });
 };
 
+exports.getVocabById = (req, res, next) => {
+    const vocab = Vocab.getById(req.params.vocabId)
+    res.send(JSON.stringify(vocab));
+};
+
 exports.vocab = vocab;

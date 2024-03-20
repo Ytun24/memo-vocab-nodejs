@@ -30,6 +30,10 @@
           <header class="card__header">
             <h1 class="vocab__title"><%= vocab.title %></h1>
           </header>
+          <p class="vocab__meaning"><%= vocab.meaning %></p>
+          <div class="card__actions">
+            <a href="/showcase/vocab/<%= vocab.id %>" class="btn">Details</a>
+        </div>
         </article>
         <% } %>
       </div>

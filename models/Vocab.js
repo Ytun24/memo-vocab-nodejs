@@ -7,10 +7,16 @@ module.exports = class Vocab {
   }
 
   save() {
-    vocabs.push(this)
+    this.id = Math.floor((Math.random() * 1000)).toString();
+    vocabs.push(this);
   }
 
   static fetchAll() {
     return vocabs;
+  }
+
+  static getById(id) {
+    const vocabById = vocabs.find(vocab => id == vocab.id)
+    return vocabById;
   }
 };
