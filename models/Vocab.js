@@ -1,22 +1,27 @@
 const vocabs = [];
 
+const db = require("../util/database");
+
 module.exports = class Vocab {
-  constructor(title, meaning) {
+  constructor(title, type, meaning, example) {
     this.title = title;
+    this.type = type;
     this.meaning = meaning;
+    this.example = example;
   }
 
   save() {
-    this.id = Math.floor((Math.random() * 1000)).toString();
-    vocabs.push(this);
+    return db.execute(
+      "INSERT INTO vocabs (title, type, meaning, example) VALUES (?, ?, ?, ?)",
+      [this.title, this.type, this.meaning, this.example]
+    );
   }
 
   static fetchAll() {
-    return vocabs;
+    return db.execute("SELECT * FROM vocabs");
   }
 
   static getById(id) {
-    const vocabById = vocabs.find(vocab => id == vocab.id)
-    return vocabById;
+    return db.execute("SELECT * FROM vocabs WHERE vocabs.id = ?", [id]);
   }
 };

@@ -19,7 +19,22 @@
 
     <main>
       <form action="add-vocab" method="POST">
-        <input type="text" name="title" />
+        <div class="form-control">
+          <label for="title">Title</label>
+          <input type="text" name="title" id="title" />
+        </div>
+        <div class="form-control">
+          <label for="type">Type</label>
+          <input type="text" name="type" id="title" />
+        </div>
+        <div class="form-control">
+          <label for="meaning">Meaning</label>
+          <textarea name="meaning" id="meaning" rows="5"></textarea>
+        </div>
+        <div class="form-control">
+          <label for="example">Example</label>
+          <textarea name="example" id="example" rows="5"></textarea>
+        </div>
         <button type="submit">Add Vocab</button>
       </form>
     </main>

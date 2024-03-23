@@ -1,31 +1,43 @@
 const path = require("path");
 const Vocab = require("../models/Vocab");
-const vocab = [];
 
 exports.getAddVocab = (req, res, next) => {
   res.sendFile(path.join(__dirname, "..", "views", "add-vocab.html"));
 };
 
 exports.postAddVocab = (req, res, next) => {
-  const vocab = new Vocab(req.body.title);
-  vocab.save();
-  res.redirect("/showcase");
+  const vocab = new Vocab(
+    req.body.title,
+    req.body.type,
+    req.body.meaning,
+    req.body.example
+  );
+  vocab
+    .save()
+    .then(() => res.redirect("/showcase"))
+    .catch((error) => console.log(error));
 };
 
 exports.getShowcase = (req, res, next) => {
-  res.render("showcase", {
-    vocabs: Vocab.fetchAll(),
-    pageTitle: "showcase",
-    path: "/showcase",
-  });
+  Vocab.fetchAll()
+    .then(([rows, fieldData]) => {
+      res.render("showcase", {
+        vocabs: rows,
+        pageTitle: "showcase",
+        path: "/showcase",
+      });
+    })
+    .catch((error) => console.log(error));
 };
 
 exports.getVocabById = (req, res, next) => {
-    const vocab = Vocab.getById(req.params.vocabId)
-    res.send(JSON.stringify(vocab));
+  Vocab.getById(req.params.vocabId)
+    .then(([rows]) => {
+      res.send(JSON.stringify(rows[0]));
+    })
+    .catch((error) => console.log(error));
 };
 
-exports.vocab = vocab;
 exports.postFavoriteVocab = (req, res, next) => {
   console.log("vocabId", req.body);
   res.redirect("/showcase");
