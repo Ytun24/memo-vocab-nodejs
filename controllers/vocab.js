@@ -26,3 +26,7 @@ exports.getVocabById = (req, res, next) => {
 };
 
 exports.vocab = vocab;
+exports.postFavoriteVocab = (req, res, next) => {
+  console.log("vocabId", req.body);
+  res.redirect("/showcase");
+};
