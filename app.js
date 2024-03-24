@@ -5,6 +5,8 @@ const bodyParser = require("body-parser");
 const memberRoutes = require("./routes/member");
 const showcaseRoutes = require("./routes/showcase");
 
+const sequelize = require('./util/database');
+
 const app = express();
 
 app.set("view engine", "ejs");
@@ -27,4 +29,12 @@ app.use("/", (req, res) => {
 });
 const server = http.createServer(app);
 
-server.listen(3000);
+sequelize
+  .sync()
+  .then((result) => {
+    // console.log(result);
+    app.listen(3000);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
