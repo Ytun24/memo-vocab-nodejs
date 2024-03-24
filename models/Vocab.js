@@ -1,27 +1,27 @@
-const vocabs = [];
+const Sequelize = require('sequelize');
+const sequelize = require('../util/database');
 
-const db = require("../util/database");
-
-module.exports = class Vocab {
-  constructor(title, type, meaning, example) {
-    this.title = title;
-    this.type = type;
-    this.meaning = meaning;
-    this.example = example;
+const Vocab = sequelize.define('vocab', {
+  id: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+    allowNull: false,
+    primaryKey: true
+  },
+  title: {
+    type: Sequelize.STRING,
+    allowNull: false
+  },
+  type: {
+    type: Sequelize.STRING
+  },
+  meaning: {
+    type: Sequelize.STRING,
+    allowNull: false
+  },
+  example: {
+    type: Sequelize.STRING
   }
+});
 
-  save() {
-    return db.execute(
-      "INSERT INTO vocabs (title, type, meaning, example) VALUES (?, ?, ?, ?)",
-      [this.title, this.type, this.meaning, this.example]
-    );
-  }
-
-  static fetchAll() {
-    return db.execute("SELECT * FROM vocabs");
-  }
-
-  static getById(id) {
-    return db.execute("SELECT * FROM vocabs WHERE vocabs.id = ?", [id]);
-  }
-};
+module.exports = Vocab;
