@@ -13,7 +13,6 @@ exports.postAddVocab = (req, res, next) => {
     example: req.body.example,
   })
     .then((result) => {
-      // console.log(result);
       console.log("Created Vocab");
       res.redirect("/showcase");
     })

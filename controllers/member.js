@@ -33,10 +33,8 @@ exports.getEditVocab = (req, res, next) => {
 
 exports.postEditVocab = (req, res, next) => {
   const vocabId = req.body.vocabId;
-  console.log("vocabId: ", vocabId);
   Vocab.findByPk(vocabId)
     .then((vocab) => {
-      console.log("vocab: ", vocab);
       vocab.title = req.body.title;
       vocab.type = req.body.type;
       vocab.meaning = req.body.meaning;
