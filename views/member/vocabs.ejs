@@ -1,0 +1,31 @@
+<body>
+  <main>
+    <% if (vocabs.length > 0) { %>
+    <div class="grid">
+      <% for (let vocab of vocabs) { %>
+      <article class="card vocab-item">
+        <header class="card__header">
+          <h1 class="vocab__title"><%= vocab.title %></h1>
+        </header>
+        <div class="card__content">
+          <p class="vocab__type"><%= vocab.type %></p>
+          <p class="vocab__meaning"><%= vocab.meaning %></p>
+          <p class="vocab__meaning"><%= vocab.example %></p>
+        </div>
+        <div class="card__actions">
+          <a href="/member/edit-vocab/<%= vocab.id %>?edit=true" class="btn"
+            >Edit</a
+          >
+          <form action="/member/delete-vocab" method="POST">
+            <input type="hidden" value="<%= vocab.id %>" name="vocabId" />
+            <button class="btn" type="submit">Delete</button>
+          </form>
+        </div>
+      </article>
+      <% } %>
+    </div>
+    <% } else { %>
+    <h1>No Vocab Found!</h1>
+    <% } %>
+  </main>
+</body>
