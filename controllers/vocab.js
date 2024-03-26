@@ -6,21 +6,22 @@ exports.getAddVocab = (req, res, next) => {
 };
 
 exports.postAddVocab = (req, res, next) => {
-  Vocab.create({
-    title: req.body.title,
-    type: req.body.type,
-    meaning: req.body.meaning,
-    example: req.body.example,
-  })
+  req.user
+    .createVocab({
+      title: req.body.title,
+      type: req.body.type,
+      meaning: req.body.meaning,
+      example: req.body.example,
+    })
     .then((result) => {
       console.log("Created Vocab");
-      res.redirect("/showcase");
+      res.redirect("/member/vocabs");
     })
     .catch((error) => console.log(error));
 };
 
 exports.getShowcase = (req, res, next) => {
-  Vocab.findAll()
+  req.user.getVocabs()
     .then((vocabs) => {
       res.render("showcase", {
         vocabs: vocabs,
@@ -32,9 +33,10 @@ exports.getShowcase = (req, res, next) => {
 };
 
 exports.getVocabById = (req, res, next) => {
-  Vocab.findByPk(req.params.vocabId)
+  req.user
+  .getVocabs({ where: { id: req.params.vocabId } })
     .then((vocab) => {
-      res.send(JSON.stringify(vocab));
+      res.send(JSON.stringify(vocab[0]));
     })
     .catch((error) => console.log(error));
 };

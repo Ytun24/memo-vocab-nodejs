@@ -20,6 +20,10 @@
             <input type="hidden" value="<%= vocab.id %>" name="vocabId" />
             <button class="btn" type="submit">Delete</button>
           </form>
+          <form action="/favorite" method="post">
+            <button class="btn" type="submit">Add to Favorite</button>
+            <input type="hidden" name="vocabId" value="<%= vocab.id %>">
+        </form>
         </div>
       </article>
       <% } %>
