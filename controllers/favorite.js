@@ -71,3 +71,39 @@ exports.postFavoriteDeleteVocab = (req, res, next) => {
     .catch((err) => console.log(err));
 };
 
+exports.postArchive = (req, res, next) => {
+  let fetchedFavorite;
+  req.user
+    .getFavorite()
+    .then((favorite) => {
+      fetchedFavorite = favorite;
+      return favorite.getVocabs();
+    })
+    .then((vocabs) => {
+      return req.user
+        .createArchive()
+        .then((archive) => {
+          return archive.addVocabs(
+            vocabs.map((vocab) => {
+              vocab.archiveItem = { priority: vocab.favoriteItem.priority };
+              return vocab;
+            })
+          );
+        })
+        .catch((err) => console.log(err));
+    })
+    .then((result) => {
+      return fetchedFavorite.setVocabs(null);
+    })
+    .then((result) => {
+      res.redirect("/favorite/archives");
+    })
+    .catch((err) => console.log(err));
+};
+
+exports.getArchives = (req, res, next) => {
+  req.user
+    .getArchives({ include: ["vocabs"] })
+    .then((archives) => res.send(archives))
+    .catch();
+};

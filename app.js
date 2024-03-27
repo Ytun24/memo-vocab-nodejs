@@ -11,6 +11,8 @@ const Vocab = require('./models/vocab');
 const User = require('./models/user');
 const Favorite = require("./models/favorite");
 const FavoriteItem = require("./models/favorite-item");
+const Archive = require("./models/archive");
+const ArchiveItem = require("./models/archive-item")
 
 const app = express();
 
@@ -50,6 +52,11 @@ User.hasOne(Favorite);
 Favorite.belongsTo(User);
 Favorite.belongsToMany(Vocab, { through: FavoriteItem });
 Vocab.belongsToMany(Favorite, { through: FavoriteItem });
+
+Archive.belongsTo(User);
+User.hasMany(Archive);
+Archive.belongsToMany(Vocab, { through: ArchiveItem });
+Vocab.belongsToMany(Archive, { through: ArchiveItem });
 
 sequelize
   // .sync({ force: true })

@@ -18,5 +18,9 @@
             <% } else { %>
                 <h1>No Vocab in Favorite!</h1>
             <% } %>
+
+            <form action="/favorite/create-archive" method="POST">
+                <button type="submit" class="btn">Archive!</button>
+            </form>
         </main>
 </body>
