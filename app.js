@@ -66,7 +66,7 @@ sequelize
   .then(user => {
     return user.createFavorite();
   })
-  .then(cart => {
+  .then(favorite => {
     app.listen(3000);
   })
   .catch(err => {

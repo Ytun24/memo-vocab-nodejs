@@ -1,4 +1,4 @@
-const Vocab = require("../models/vocab")
+const Vocab = require("../models/vocab");
 
 exports.getFavorites = (req, res, next) => {
   req.user
@@ -52,3 +52,22 @@ exports.postVocabToFavorite = (req, res, next) => {
     })
     .catch((err) => console.log(err));
 };
+
+exports.postFavoriteDeleteVocab = (req, res, next) => {
+  const vocabId = req.body.vocabId;
+  req.user
+    .getFavorite({ where: { id: vocabId } })
+    .then((favorite) => {
+      return favorite.getVocabs();
+    })
+    .then((vocabs) => {
+      res.send(vocabs);
+      return vocabs[0].favoriteItem.destroy();
+    })
+    .then((result) => {
+      console.log("Deleted vocab from favorite!");
+      res.redirect("/favorite");
+    })
+    .catch((err) => console.log(err));
+};
+

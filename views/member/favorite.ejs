@@ -5,11 +5,11 @@
             <% if (vocabs.length > 0) { %>
                 <ul class="cart__item-list">
                     <% vocabs.forEach(vocab => { %>
-                        <li class="cart__item">
+                        <li class="favorite__item">
                             <h1><%= vocab.title %></h1>
                             <h2>Priority: <%= vocab.favoriteItem.priority %></h2>
-                            <form action="/cart-delete-item" method="POST">
-                                <input type="hidden" value="<%= vocab.id %>" name="productId">
+                            <form action="/favorite/delete-item" method="POST">
+                                <input type="hidden" value="<%= vocab.id %>" name="vocabId">
                                 <button class="btn danger" type="submit">Delete</button>
                             </form>
                         </li>
