@@ -2,17 +2,22 @@ const http = require("http");
 const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
+const session = require("express-session");
+const Sequelize = require("sequelize");
+const SequelizeStore = require("connect-session-sequelize")(session.Store);
+
 const memberRoutes = require("./routes/member");
 const showcaseRoutes = require("./routes/showcase");
 const favoriteRoutes = require("./routes/favorite");
+const authRoutes = require("./routes/auth");
 
-const sequelize = require('./util/database');
-const Vocab = require('./models/vocab');
-const User = require('./models/user');
+const sequelize = require("./util/database");
+const Vocab = require("./models/vocab");
+const User = require("./models/user");
 const Favorite = require("./models/favorite");
 const FavoriteItem = require("./models/favorite-item");
 const Archive = require("./models/archive");
-const ArchiveItem = require("./models/archive-item")
+const ArchiveItem = require("./models/archive-item");
 
 const app = express();
 
@@ -28,24 +33,36 @@ app.use(bodyParser.json());
 
 app.use(express.static(path.join(__dirname, "public")));
 
+app.use(
+  session({
+    secret: "my secret",
+    resave: false,
+    saveUninitialized: false,
+    store: new SequelizeStore({
+      db: sequelize,
+    }),
+  })
+);
+
 app.use((req, res, next) => {
   User.findByPk(1)
-    .then(user => {
-      req.user = user; 
+    .then((user) => {
+      req.user = user;
       next();
     })
-    .catch(err => console.log(err));
+    .catch((err) => console.log(err));
 });
 
 app.use("/member", memberRoutes);
 app.use("/favorite", favoriteRoutes);
 app.use("/showcase", showcaseRoutes);
+app.use(authRoutes);
 
 app.use("/", (req, res) => {
   res.status(404).sendFile(path.join(__dirname, "views", "404.html"));
 });
 
-Vocab.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
+Vocab.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
 User.hasMany(Vocab);
 
 User.hasOne(Favorite);
@@ -59,23 +76,23 @@ Archive.belongsToMany(Vocab, { through: ArchiveItem });
 Vocab.belongsToMany(Archive, { through: ArchiveItem });
 
 sequelize
-  // .sync({ force: true })
-  .sync()
-  .then(result => {
+  .sync({ force: true })
+  // .sync()
+  .then((result) => {
     return User.findByPk(1);
   })
-  .then(user => {
+  .then((user) => {
     if (!user) {
-      return User.create({ name: 'Ying', email: 'test@mail.com' });
+      return User.create({ name: "Ying", email: "test@mail.com" });
     }
     return user;
   })
-  .then(user => {
+  .then((user) => {
     return user.createFavorite();
   })
-  .then(favorite => {
+  .then((favorite) => {
     app.listen(3000);
   })
-  .catch(err => {
+  .catch((err) => {
     console.log(err);
   });
