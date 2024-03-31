@@ -56,6 +56,11 @@ app.use((req, res, next) => {
     .catch((err) => console.log(err));
 });
 
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  next();
+});
+
 app.use("/member", memberRoutes);
 app.use("/favorite", favoriteRoutes);
 app.use("/showcase", showcaseRoutes);
@@ -79,8 +84,8 @@ Archive.belongsToMany(Vocab, { through: ArchiveItem });
 Vocab.belongsToMany(Archive, { through: ArchiveItem });
 
 sequelize
-  .sync({ force: true })
-  // .sync()
+  // .sync({ force: true })
+  .sync()
   .then(() => {
     app.listen(3000);
   })

@@ -2,20 +2,19 @@ const express = require("express");
 
 const router = express.Router();
 
-const vocabController = require("../controllers/vocab")
-const memberController = require("../controllers/member")
+const vocabController = require("../controllers/vocab");
+const memberController = require("../controllers/member");
+const isAuth = require("../middleware/is-auth");
 
-router.get("/add-vocab", vocabController.getAddVocab);
-router.post("/add-vocab", vocabController.postAddVocab);
+router.get("/add-vocab", isAuth, vocabController.getAddVocab);
+router.post("/add-vocab", isAuth, vocabController.postAddVocab);
 
-router.post("/favorite-vocab", vocabController.postFavoriteVocab);
+router.post("/favorite-vocab", isAuth, vocabController.postFavoriteVocab);
 
+router.get("/vocabs", isAuth, memberController.getVocabs);
 
-router.get('/vocabs', memberController.getVocabs);
-
-router.get('/edit-vocab/:vocabId', memberController.getEditVocab);
-router.post('/edit-vocab', memberController.postEditVocab);
-router.post('/delete-vocab', memberController.postDeleteVocab);
+router.get("/edit-vocab/:vocabId", isAuth, memberController.getEditVocab);
+router.post("/edit-vocab", isAuth, memberController.postEditVocab);
+router.post("/delete-vocab", isAuth, memberController.postDeleteVocab);
 
 module.exports = router;
-

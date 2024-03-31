@@ -5,8 +5,7 @@ exports.getVocabs = (req, res, next) => {
     res.render("member/vocabs", {
       vocabs: vocabs,
       pageTitle: "Admin Vocabs",
-      path: "/member/vocabs",
-      isAuthenticated: req.session.isLoggedIn
+      path: "/member/vocabs"    
     });
   });
 };
@@ -26,8 +25,7 @@ exports.getEditVocab = (req, res, next) => {
         pageTitle: "Edit Vocab",
         path: "/member/edit-vocab",
         editing: editMode,
-        vocab: vocab,
-        isAuthenticated: req.session.isLoggedIn
+        vocab: vocab
       });
     })
     .catch((err) => console.log(err));

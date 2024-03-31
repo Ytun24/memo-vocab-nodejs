@@ -1,6 +1,17 @@
 const bcrypt = require("bcryptjs");
+const nodemailer = require('nodemailer');
+const sendgridTransport = require('nodemailer-sendgrid-transport');
 
 const User = require("../models/user");
+
+const transporter = nodemailer.createTransport(
+  sendgridTransport({
+    auth: {
+      api_key:
+        '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'
+    }
+  })
+);
 
 exports.getLogin = (req, res, next) => {
   console.log(req.session.user);
@@ -21,13 +32,27 @@ exports.getSignup = (req, res, next) => {
 };
 
 exports.postLogin = (req, res, next) => {
-  User.findByPk(1)
+  const email = req.body.email;
+  const password = req.body.password;
+  User.findOne({ email: email })
     .then((user) => {
-      req.session.isLoggedIn = true;
-      req.session.user = user;
-      req.session.save((error) => {
-        console.log(error);
-        res.redirect("/member/vocabs");
+      if (!user) {
+        res.redirect("/login");
+      }
+
+      bcrypt
+      .compare(password, user.password)
+      .then(doMatch => {
+        if (doMatch) {
+          req.session.isLoggedIn = true;
+          req.session.user = user;
+          return req.session.save((error) => {
+            console.log(error);
+            res.redirect("/member/vocabs");
+          });
+        }
+
+        res.redirect('/login');
       });
     })
     .catch((err) => console.log(err));
@@ -58,10 +83,24 @@ exports.postSignup = (req, res, next) => {
           user.save().then((user) => {
             user.createFavorite().then(() => {
               res.redirect("/login");
+              return transporter.sendMail({
+                to: email, // Change to your recipient
+                from: 'nanying@windowslive.com', // Change to your verified sender
+                subject: 'Sending with SendGrid is Fun',
+                text: 'and easy to do anywhere, even with Node.js',
+                html: '<strong>and easy to do anywhere, even with Node.js</strong>',
+              });
             });
           });
         })
         .catch((err) => console.log(err));
     })
     .catch((err) => console.log(err));
+};
+
+exports.getReset = (req, res, next) => {
+  res.render('auth/reset', {
+    path: '/reset',
+    pageTitle: 'Reset Password'
+  });
 };
