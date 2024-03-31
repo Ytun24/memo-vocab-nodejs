@@ -45,7 +45,10 @@ app.use(
 );
 
 app.use((req, res, next) => {
-  User.findByPk(1)
+  if (!req.session.user) {
+    return next();
+  }
+  User.findByPk(req.session.user.id)
     .then((user) => {
       req.user = user;
       next();
@@ -78,19 +81,7 @@ Vocab.belongsToMany(Archive, { through: ArchiveItem });
 sequelize
   .sync({ force: true })
   // .sync()
-  .then((result) => {
-    return User.findByPk(1);
-  })
-  .then((user) => {
-    if (!user) {
-      return User.create({ name: "Ying", email: "test@mail.com" });
-    }
-    return user;
-  })
-  .then((user) => {
-    return user.createFavorite();
-  })
-  .then((favorite) => {
+  .then(() => {
     app.listen(3000);
   })
   .catch((err) => {

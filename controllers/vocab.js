@@ -21,12 +21,13 @@ exports.postAddVocab = (req, res, next) => {
 };
 
 exports.getShowcase = (req, res, next) => {
-  req.user.getVocabs()
+  Vocab.findAll()
     .then((vocabs) => {
       res.render("showcase", {
         vocabs: vocabs,
         pageTitle: "showcase",
         path: "/showcase",
+        isAuthenticated: false
       });
     })
     .catch((error) => console.log(error));

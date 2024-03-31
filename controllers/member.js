@@ -6,6 +6,7 @@ exports.getVocabs = (req, res, next) => {
       vocabs: vocabs,
       pageTitle: "Admin Vocabs",
       path: "/member/vocabs",
+      isAuthenticated: req.session.isLoggedIn
     });
   });
 };
@@ -26,6 +27,7 @@ exports.getEditVocab = (req, res, next) => {
         path: "/member/edit-vocab",
         editing: editMode,
         vocab: vocab,
+        isAuthenticated: req.session.isLoggedIn
       });
     })
     .catch((err) => console.log(err));
