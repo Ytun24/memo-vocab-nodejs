@@ -27,15 +27,14 @@ exports.getShowcase = (req, res, next) => {
         vocabs: vocabs,
         pageTitle: "showcase",
         path: "/showcase",
-        isAuthenticated: false
+        isAuthenticated: false,
       });
     })
     .catch((error) => console.log(error));
 };
 
 exports.getVocabById = (req, res, next) => {
-  req.user
-  .getVocabs({ where: { id: req.params.vocabId } })
+  Vocab.findOne({ where: { id: req.params.vocabId } })
     .then((vocab) => {
       res.send(JSON.stringify(vocab[0]));
     })

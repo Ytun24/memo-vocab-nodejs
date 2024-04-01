@@ -1,11 +1,11 @@
 const Vocab = require("../models/vocab");
 
 exports.getVocabs = (req, res, next) => {
-  Vocab.findAll().then((vocabs) => {
+  Vocab.findAll({ where: { userId: req.user.id } }).then((vocabs) => {
     res.render("member/vocabs", {
       vocabs: vocabs,
       pageTitle: "Admin Vocabs",
-      path: "/member/vocabs"    
+      path: "/member/vocabs",
     });
   });
 };
@@ -25,7 +25,7 @@ exports.getEditVocab = (req, res, next) => {
         pageTitle: "Edit Vocab",
         path: "/member/edit-vocab",
         editing: editMode,
-        vocab: vocab
+        vocab: vocab,
       });
     })
     .catch((err) => console.log(err));
@@ -35,6 +35,10 @@ exports.postEditVocab = (req, res, next) => {
   const vocabId = req.body.vocabId;
   Vocab.findByPk(vocabId)
     .then((vocab) => {
+      console.log(vocab.userId, req.user.id);
+      if (vocab.userId !== req.user.id) {
+        return res.redirect("/member/vocabs");
+      }
       vocab.title = req.body.title;
       vocab.type = req.body.type;
       vocab.meaning = req.body.meaning;
@@ -52,6 +56,9 @@ exports.postDeleteVocab = (req, res, next) => {
   const vocabId = req.body.vocabId;
   Vocab.findByPk(vocabId)
     .then((vocab) => {
+      if (vocab.userId !== req.user.id) {
+        return res.redirect("/member/vocabs");
+      }
       return vocab.destroy();
     })
     .then((result) => {

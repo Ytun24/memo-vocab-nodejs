@@ -1,6 +1,8 @@
+const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
-const nodemailer = require('nodemailer');
-const sendgridTransport = require('nodemailer-sendgrid-transport');
+const nodemailer = require("nodemailer");
+const sendgridTransport = require("nodemailer-sendgrid-transport");
+const { Op } = require("sequelize");
 
 const User = require("../models/user");
 
@@ -8,8 +10,8 @@ const transporter = nodemailer.createTransport(
   sendgridTransport({
     auth: {
       api_key:
-        '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'
-    }
+        "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",
+    },
   })
 );
 
@@ -19,7 +21,6 @@ exports.getLogin = (req, res, next) => {
   res.render("auth/login", {
     path: "/login",
     pageTitle: "Login",
-    isAuthenticated: false,
   });
 };
 
@@ -27,22 +28,19 @@ exports.getSignup = (req, res, next) => {
   res.render("auth/signup", {
     path: "/signup",
     pageTitle: "Signup",
-    isAuthenticated: false,
   });
 };
 
 exports.postLogin = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
-  User.findOne({ email: email })
+  User.findOne({ where: { email: email } })
     .then((user) => {
       if (!user) {
         res.redirect("/login");
       }
 
-      bcrypt
-      .compare(password, user.password)
-      .then(doMatch => {
+      bcrypt.compare(password, user.password).then((doMatch) => {
         if (doMatch) {
           req.session.isLoggedIn = true;
           req.session.user = user;
@@ -52,7 +50,7 @@ exports.postLogin = (req, res, next) => {
           });
         }
 
-        res.redirect('/login');
+        res.redirect("/login");
       });
     })
     .catch((err) => console.log(err));
@@ -85,10 +83,10 @@ exports.postSignup = (req, res, next) => {
               res.redirect("/login");
               return transporter.sendMail({
                 to: email, // Change to your recipient
-                from: 'nanying@windowslive.com', // Change to your verified sender
-                subject: 'Sending with SendGrid is Fun',
-                text: 'and easy to do anywhere, even with Node.js',
-                html: '<strong>and easy to do anywhere, even with Node.js</strong>',
+                from: "nanying@windowslive.com", // Change to your verified sender
+                subject: "Sending with SendGrid is Fun",
+                text: "and easy to do anywhere, even with Node.js",
+                html: "<strong>and easy to do anywhere, even with Node.js</strong>",
               });
             });
           });
@@ -99,8 +97,85 @@ exports.postSignup = (req, res, next) => {
 };
 
 exports.getReset = (req, res, next) => {
-  res.render('auth/reset', {
-    path: '/reset',
-    pageTitle: 'Reset Password'
+  res.render("auth/reset", {
+    path: "/reset",
+    pageTitle: "Reset Password",
   });
+};
+
+exports.postReset = (req, res, next) => {
+  crypto.randomBytes(32, (err, buffer) => {
+    const token = buffer.toString("hex");
+    User.findOne({ where: { email: req.body.email } })
+      .then((user) => {
+        if (!user) {
+          return res.redirect("/reset");
+        }
+        user.resetToken = token;
+        user.resetTokenExpiration = Date.now() + 3600000;
+        return user.save();
+      })
+      .then((result) => {
+        res.redirect("/login");
+        transporter.sendMail({
+          to: req.body.email,
+          from: "nanying@windowslive.com",
+          subject: "Password reset",
+          html: `
+          <p>You requested a password reset</p>
+          <p>Click this <a href="http://localhost:3000/reset/${token}">link</a> to set a new password.</p>
+        `,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  });
+};
+
+exports.getNewPassword = (req, res, next) => {
+  const token = req.params.token;
+  User.findOne({
+    where: {
+      resetToken: token,
+      resetTokenExpiration: { [Op.gt]: Date.now() },
+    },
+  })
+    .then((user) => {
+      res.render("auth/new-password", {
+        path: "/new-password",
+        pageTitle: "New Password",
+        userId: user.id,
+        passwordToken: token,
+      });
+    })
+    .catch((err) => console.log(err));
+};
+
+exports.postNewPassword = (req, res, next) => {
+  const newPassword = req.body.password;
+  const passwordToken = req.body.resetToken;
+  let resetUser;
+
+  User.findOne({
+    where: {
+      resetToken: token,
+      resetTokenExpiration: { [Op.gt]: Date.now() },
+    },
+  })
+    .then((user) => {
+      resetUser = user;
+      return bcrypt.hash(newPassword, 12);
+    })
+    .then((hashedPassword) => {
+      resetUser.password = hashedPassword;
+      resetUser.resetToken = null;
+      resetUser.resetTokenExpiration = null;
+      return resetUser.save();
+    })
+    .then((result) => {
+      console.log("Reset Password Successfully");
+      res.redirect("/login");
+    })
+    .catch((err) => console.log(err));
 };
