@@ -1,11 +1,18 @@
 const path = require("path");
 const Vocab = require("../models/vocab");
 
+const { validationResult } = require("express-validator")
+
 exports.getAddVocab = (req, res, next) => {
   res.sendFile(path.join(__dirname, "..", "views", "add-vocab.html"));
 };
 
 exports.postAddVocab = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log(errors.array())
+    return res.status(422).sendFile(path.join(__dirname, "..", "views", "add-vocab.html"));
+  }
   req.user
     .createVocab({
       title: req.body.title,

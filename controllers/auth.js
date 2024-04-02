@@ -4,6 +4,8 @@ const nodemailer = require("nodemailer");
 const sendgridTransport = require("nodemailer-sendgrid-transport");
 const { Op } = require("sequelize");
 
+const { validationResult } = require("express-validator");
+
 const User = require("../models/user");
 
 const transporter = nodemailer.createTransport(
@@ -34,6 +36,7 @@ exports.getSignup = (req, res, next) => {
 exports.postLogin = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
+
   User.findOne({ where: { email: email } })
     .then((user) => {
       if (!user) {
@@ -66,32 +69,33 @@ exports.postLogout = (req, res, next) => {
 exports.postSignup = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
-  const confirmPassword = req.body.confirmPassword;
 
-  User.findOne({ where: { email: email } })
-    .then((user) => {
-      if (user) {
-        return res.redirect("/signup");
-      }
+  const errors = validationResult(req);
 
-      return bcrypt
-        .hash(password, 12)
-        .then((encryptPassword) => {
-          const user = new User({ email: email, password: encryptPassword });
-          user.save().then((user) => {
-            user.createFavorite().then(() => {
-              res.redirect("/login");
-              return transporter.sendMail({
-                to: email, // Change to your recipient
-                from: "nanying@windowslive.com", // Change to your verified sender
-                subject: "Sending with SendGrid is Fun",
-                text: "and easy to do anywhere, even with Node.js",
-                html: "<strong>and easy to do anywhere, even with Node.js</strong>",
-              });
-            });
+  if (!errors.isEmpty()) {
+    console.log(errors.array());
+    return res.status(422).render("auth/signup", {
+      path: "/signup",
+      pageTitle: "Signup"
+    });
+  }
+
+  return bcrypt
+    .hash(password, 12)
+    .then((encryptPassword) => {
+      const user = new User({ email: email, password: encryptPassword });
+      user.save().then((user) => {
+        user.createFavorite().then(() => {
+          res.redirect("/login");
+          return transporter.sendMail({
+            to: email, // Change to your recipient
+            from: "nanying@windowslive.com", // Change to your verified sender
+            subject: "Sending with SendGrid is Fun",
+            text: "and easy to do anywhere, even with Node.js",
+            html: "<strong>and easy to do anywhere, even with Node.js</strong>",
           });
-        })
-        .catch((err) => console.log(err));
+        });
+      });
     })
     .catch((err) => console.log(err));
 };

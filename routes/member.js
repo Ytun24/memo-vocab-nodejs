@@ -6,8 +6,10 @@ const vocabController = require("../controllers/vocab");
 const memberController = require("../controllers/member");
 const isAuth = require("../middleware/is-auth");
 
+const { body } = require("express-validator")
+
 router.get("/add-vocab", isAuth, vocabController.getAddVocab);
-router.post("/add-vocab", isAuth, vocabController.postAddVocab);
+router.post("/add-vocab", isAuth, body("title").isAlpha('en-US', {ignore: ' '}), vocabController.postAddVocab);
 
 router.post("/favorite-vocab", isAuth, vocabController.postFavoriteVocab);
 
