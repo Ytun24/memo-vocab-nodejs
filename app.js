@@ -53,7 +53,7 @@ app.use((req, res, next) => {
       req.user = user;
       next();
     })
-    .catch((err) => console.log(err));
+    .catch((err) => next(new Error(err)));
 });
 
 app.use((req, res, next) => {
@@ -69,6 +69,11 @@ app.use(authRoutes);
 app.use("/", (req, res) => {
   res.status(404).sendFile(path.join(__dirname, "views", "404.html"));
 });
+
+app.use((err, req, res, next) => {
+  console.error(err.stack)
+  res.status(500).send('Something went wrong!')
+})
 
 Vocab.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
 User.hasMany(Vocab);

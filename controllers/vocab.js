@@ -24,7 +24,7 @@ exports.postAddVocab = (req, res, next) => {
       console.log("Created Vocab");
       res.redirect("/member/vocabs");
     })
-    .catch((error) => console.log(error));
+    .catch((error) => { throw new Error(error) });
 };
 
 exports.getShowcase = (req, res, next) => {
