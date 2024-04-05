@@ -121,6 +121,7 @@ exports.postReset = (req, res, next) => {
       })
       .then((result) => {
         res.redirect("/login");
+        console.log(`http://localhost:3000/reset/${token}`);
         transporter.sendMail({
           to: req.body.email,
           from: "nanying@windowslive.com",
@@ -158,12 +159,12 @@ exports.getNewPassword = (req, res, next) => {
 
 exports.postNewPassword = (req, res, next) => {
   const newPassword = req.body.password;
-  const passwordToken = req.body.resetToken;
+  const passwordToken = req.body.passwordToken;
   let resetUser;
 
   User.findOne({
     where: {
-      resetToken: token,
+      resetToken: passwordToken,
       resetTokenExpiration: { [Op.gt]: Date.now() },
     },
   })
