@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const session = require("express-session");
 const Sequelize = require("sequelize");
 const SequelizeStore = require("connect-session-sequelize")(session.Store);
+const multer = require("multer");
 
 const memberRoutes = require("./routes/member");
 const showcaseRoutes = require("./routes/showcase");
@@ -21,6 +22,27 @@ const ArchiveItem = require("./models/archive-item");
 
 const app = express();
 
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "images/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, new Date().toISOString() + "-" + file.originalname);
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
 app.set("view engine", "ejs");
 app.set("views", "views");
 
@@ -29,9 +51,16 @@ app.use(
     extended: true,
   })
 );
+
 app.use(bodyParser.json());
+app.use(
+  multer({
+    storage: fileStorage,
+  }).single("image")
+);
 
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use(
   session({
@@ -71,9 +100,9 @@ app.use("/", (req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  console.error(err.stack)
-  res.status(500).send('Something went wrong!')
-})
+  console.error(err.stack);
+  res.status(500).send("Something went wrong!");
+});
 
 Vocab.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
 User.hasMany(Vocab);

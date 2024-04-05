@@ -8,6 +8,9 @@ exports.getAddVocab = (req, res, next) => {
 };
 
 exports.postAddVocab = (req, res, next) => {
+  const image = req.file;
+  const imageUrl = image.path;
+  
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.log(errors.array())
@@ -19,6 +22,7 @@ exports.postAddVocab = (req, res, next) => {
       type: req.body.type,
       meaning: req.body.meaning,
       example: req.body.example,
+      imageUrl: imageUrl
     })
     .then((result) => {
       console.log("Created Vocab");

@@ -27,6 +27,9 @@
           <p class="vocab__type"><%= vocab.type %></p>
           <p class="vocab__meaning"><%= vocab.meaning %></p>
           <p class="vocab__meaning"><%= vocab.example %></p>
+          <div class="card__image">
+            <img src="/<%= vocab.imageUrl %>" alt="<%= vocab.title %>" />
+          </div>
         </div>
         <div class="card__actions">
           <a href="/member/edit-vocab/<%= vocab.id %>?edit=true" class="btn"
