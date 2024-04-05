@@ -56,6 +56,13 @@
           </div>
         </article>
         <% } %>
+
+        <div>
+          <p>pages</p>
+          <% for (let i = 1; i <= totalPage; i++) { %>
+          <a href="?page=<%= i %>"><%= i %></a>
+          <% } %>
+        </div>
       </div>
       <% } else { %>
       <h1>No Vocab Found!</h1>
