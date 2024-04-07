@@ -1,16 +1,11 @@
-const http = require("http");
-
 const express = require("express");
+const bodyParser = require("body-parser");
 
 const app = express();
+const vocabRouters = require("./routes/vocab");
 
-app.use((req, res, next) => {
-  res.write("<html>");
-  res.write("<h1>Welcome!</h1>");
-  res.write("</html>");
-  res.end();
-});
+app.use(bodyParser.json());
 
-const server = http.createServer(app);
+app.use("", vocabRouters);
 
-server.listen(3000);
+app.listen(3000);
