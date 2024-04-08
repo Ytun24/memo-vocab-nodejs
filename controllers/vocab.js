@@ -1,12 +1,23 @@
 const Vocab = require("../models/vocab");
 const { validationResult } = require("express-validator");
+const path = require("path");
 
 exports.getVocabs = (req, res, next) => {
-  Vocab.find()
+  const currentPage = req.query.page || 1;
+  const perPage = 2;
+  let totalItems;
+  Vocab.countDocuments()
+    .then((count) => {
+      totalItems = count;
+      return Vocab.find()
+        .skip((currentPage - 1) * perPage)
+        .limit(perPage);
+    })
     .then((vocabs) => {
       res.status(200).json({
         message: "get vocab successfully!",
         vocabs: vocabs,
+        totalItems: totalItems,
       });
     })
     .catch((err) => next(err));
@@ -37,10 +48,11 @@ exports.postVocab = (req, res, next) => {
 
   const title = req.body.title;
   const meaning = req.body.meaning;
+  const image = req?.file?.path ?? "";
   const vocab = new Vocab({
     title,
     meaning,
-    imageUrl: "images/baymax.jpg",
+    imageUrl: image,
     creator: { name: "Ying" },
   });
 
@@ -52,4 +64,73 @@ exports.postVocab = (req, res, next) => {
         .json({ message: "post vocab successfully!", vocab: result });
     })
     .catch((err) => next(err));
+};
+
+exports.updateVocab = (req, res, next) => {
+  const vocabId = req.params.vocabId;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = new Error("Validation failed");
+    error.statusCode = 422;
+    throw error;
+  }
+  const title = req.body.title;
+  const meaning = req.body.meaning;
+  let imageUrl = req.body.image ?? "";
+  if (req.file) {
+    imageUrl = req.file.path;
+  }
+  Vocab.findById(vocabId)
+    .then((vocab) => {
+      if (!vocab) {
+        const error = new Error("Could not find vocab.");
+        error.statusCode = 404;
+        throw error;
+      }
+      if (imageUrl !== vocab.imageUrl) {
+        clearImage(vocab.imageUrl);
+      }
+      vocab.title = title;
+      vocab.imageUrl = imageUrl;
+      vocab.meaning = meaning;
+      return vocab.save();
+    })
+    .then((result) => {
+      res.status(200).json({ message: "Vocab updated!", vocab: result });
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+};
+
+exports.deleteVocab = (req, res, next) => {
+  const vocabId = req.params.vocabId;
+  Vocab.findById(vocabId)
+    .then((vocab) => {
+      if (!vocab) {
+        const error = new Error("Could not find vocab.");
+        error.statusCode = 404;
+        throw error;
+      }
+      clearImage(vocab.imageUrl);
+      return Vocab.findByIdAndRemove(vocabId);
+    })
+    .then((result) => {
+      console.log(result);
+      res.status(200).json({ message: "Deleted vocab." });
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+};
+
+const clearImage = (filePath) => {
+  filePath = path.join(__dirname, "..", filePath);
+  fs.unlink(filePath, (err) => console.log(err));
 };
