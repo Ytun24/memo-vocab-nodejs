@@ -6,6 +6,7 @@ const router = express.Router();
 const vocabController = require("../controllers/vocab");
 
 router.get("/vocabs", vocabController.getVocabs);
+router.get("/vocab/:vocabId", vocabController.getVocab)
 router.post(
   "/vocab",
   [
