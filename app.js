@@ -19,6 +19,13 @@ app.use(bodyParser.json());
 
 app.use("", vocabRouters);
 
+app.use((error, req, res, next) => {
+  if (error) {
+    const status = error.statusCode || 500;
+    res.status(status).json({ message: error.message });
+  }
+});
+
 mongoose
   .connect(
     "mongodb+srv://tunyaporns:ef3OO11xcSHlGQWB@clusterytun.iywh1dl.mongodb.net/memo-vocab?retryWrites=true&w=majority&appName=ClusterYtun"

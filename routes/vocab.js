@@ -9,7 +9,7 @@ router.get("/vocabs", vocabController.getVocabs);
 router.post(
   "/vocab",
   [
-    body("title").trim().isLength({ min: 2 }),
+    body("title").trim().isLength({ min: 5 }),
     body("meaning").trim().isLength({ min: 5 }),
   ],
   vocabController.postVocab

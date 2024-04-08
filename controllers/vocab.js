@@ -9,16 +9,16 @@ exports.getVocabs = async (req, res, next) => {
         vocabs: vocabs,
       });
     })
-    .catch();
+    .catch((err) => next(err));
 };
 
 exports.postVocab = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(422).json({
-      message: "Validation failed, entered data is incorrect.",
-      errors: errors.array(),
-    });
+    console.log("Validation Result: ", errors.array())
+    const error = new Error("Validation failed");
+    error.statusCode = 422;
+    throw error;
   }
 
   const title = req.body.title;
@@ -37,5 +37,5 @@ exports.postVocab = (req, res, next) => {
         .status(201)
         .json({ message: "post vocab successfully!", vocab: result });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => next(err));
 };
