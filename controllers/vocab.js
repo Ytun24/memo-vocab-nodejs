@@ -18,7 +18,7 @@ exports.getVocab = (req, res, next) => {
     .then((vocab) => {
       if (!vocab) {
         const error = new Error("No vocab found!");
-        error.statusCose = 422;
+        error.statusCose = 404;
         throw error;
       }
       res.status(200).json({ message: "get vocab successfully", vocab: vocab });
