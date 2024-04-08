@@ -1,22 +1,15 @@
 const Vocab = require("../models/vocab");
 const { validationResult } = require("express-validator");
 
-exports.getVocabs = (req, res, next) => {
-  res.status(200).json({
-    message: "get vocab successfully!",
-    vocabs: [
-      {
-        _id: "1",
-        title: "First Vocab",
-        content: "This is the first vocab!",
-        imageUrl: "images/duck.jpg",
-        creator: {
-          name: "Ying",
-        },
-        createdAt: new Date(),
-      },
-    ],
-  });
+exports.getVocabs = async (req, res, next) => {
+  Vocab.find()
+    .then((vocabs) => {
+      res.status(200).json({
+        message: "get vocab successfully!",
+        vocabs: vocabs,
+      });
+    })
+    .catch();
 };
 
 exports.postVocab = (req, res, next) => {
