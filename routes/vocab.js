@@ -10,12 +10,19 @@ router.get("/vocab/:vocabId", vocabController.getVocab);
 router.post(
   "/vocab",
   [
-    body("title").trim().isLength({ min: 5 }),
+    body("title").trim().isLength({ min: 2 }),
     body("meaning").trim().isLength({ min: 5 }),
   ],
   vocabController.postVocab
 );
-router.put("/vocab/vocabId", vocabController.updateVocab);
+router.put(
+  "/vocab/vocabId",
+  [
+    body("title").trim().isLength({ min: 2 }),
+    body("meaning").trim().isLength({ min: 5 }),
+  ],
+  vocabController.updateVocab
+);
 router.delete("/vocab/vocabId", vocabController.deleteVocab);
 
 module.exports = router;
