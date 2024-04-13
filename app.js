@@ -6,6 +6,7 @@ const multer = require("multer");
 
 const app = express();
 const vocabRouters = require("./routes/vocab");
+const authRoutes = require("./routes/auth")
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -45,6 +46,7 @@ app.use(
 app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use("", vocabRouters);
+app.use("", authRoutes);
 
 app.use((error, req, res, next) => {
   if (error) {
