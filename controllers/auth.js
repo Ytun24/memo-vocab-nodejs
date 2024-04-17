@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { validationResult } = require("express-validator");
 
 const User = require("../models/user");
 
@@ -10,9 +11,10 @@ exports.signup = async (req, res, next) => {
   const name = req.body.name;
 
   try {
-    const exUser = await User.findOne({ email: email });
-    if (exUser) {
-      const error = new Error("User have already existed");
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      console.log("validation result: ", errors.array());
+      const error = new Error("Invalid input");
       error.statusCode = 422;
       throw error;
     }
