@@ -7,7 +7,6 @@ const User = require("../models/user");
 exports.signup = async (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
-  const confirmPassword = req.body.confirmPassword;
   const name = req.body.name;
 
   try {

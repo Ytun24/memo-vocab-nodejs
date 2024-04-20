@@ -4,11 +4,14 @@
   "description": "",
   "main": "app.js",
   "scripts": {
+    "test": "jest",
+    "coverage": "jest --coverage",
     "start": "nodemon app.js"
   },
   "author": "Tunyaporn Subsakorn",
   "license": "ISC",
   "devDependencies": {
+    "jest": "^29.7.0",
     "nodemon": "^3.1.0"
   },
   "dependencies": {
