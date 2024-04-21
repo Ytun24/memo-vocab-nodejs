@@ -4,8 +4,9 @@ const { body } = require("express-validator");
 const router = express.Router();
 
 const vocabController = require("../controllers/vocab");
+const isAuth = require("../middleware/is-auth");
 
-router.get("/vocabs", vocabController.getVocabs);
+router.get("/vocabs", isAuth, vocabController.getVocabs);
 router.get("/vocab/:vocabId", vocabController.getVocab);
 router.post(
   "/vocab",
