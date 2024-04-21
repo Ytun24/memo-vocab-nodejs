@@ -41,6 +41,14 @@ exports.login = async (req, res, next) => {
   let loadedUser;
 
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      console.log("validation result: ", errors.array());
+      const error = new Error("Invalid input");
+      error.statusCode = 422;
+      throw error;
+    }
+
     const user = await User.findOne({ email: email });
     if (!user) {
       const error = new Error("Username or password is wrong!");
