@@ -171,7 +171,7 @@ describe("AuthController", () => {
     await authController.login(mockedReq, mockedRes, mockedNext);
 
     expect(mockedNext.mock.calls[0][0].statusCode).toBe(401);
-    expect(mockedNext.mock.calls[0][0].message).toBe("Username or password is wrong!");
+    expect(mockedNext.mock.calls[0][0].message).toBe("Email or password is wrong!");
   });
 
   test("[login] should send error to next middleware when password is not match", async () => {
@@ -190,7 +190,7 @@ describe("AuthController", () => {
     await authController.login(mockedReq, mockedRes, mockedNext);
 
     expect(mockedNext.mock.calls[0][0].statusCode).toBe(401);
-    expect(mockedNext.mock.calls[0][0].message).toBe("Username or password is wrong!");
+    expect(mockedNext.mock.calls[0][0].message).toBe("Email or password is wrong!");
   });
 
   test("[login] should send error to next middleware when token sign error", async () => {
