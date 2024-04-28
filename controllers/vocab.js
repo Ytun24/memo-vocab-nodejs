@@ -3,25 +3,27 @@ const { validationResult } = require("express-validator");
 const path = require("path");
 const User = require("../models/user");
 
-exports.getVocabs = (req, res, next) => {
-  const currentPage = req.query.page || 1;
-  const perPage = 2;
+exports.getVocabs = async (req, res, next) => {
+  const currentPage = req.query?.page || 1;
+  const perPage = 4;
   let totalItems;
-  Vocab.countDocuments()
-    .then((count) => {
-      totalItems = count;
-      return Vocab.find()
-        .skip((currentPage - 1) * perPage)
-        .limit(perPage);
-    })
-    .then((vocabs) => {
-      res.status(200).json({
-        message: "get vocab successfully!",
-        vocabs: vocabs,
-        totalItems: totalItems,
-      });
-    })
-    .catch((err) => next(err));
+
+  try {
+    const count = await Vocab.countDocuments({ creator: req.userId });
+    totalItems = count;
+
+    const vocabs = await Vocab.find({ creator: req.userId })
+      .skip((currentPage - 1) * perPage)
+      .limit(perPage);
+
+    res.status(200).json({
+      message: "get vocab successfully!",
+      vocabs: vocabs,
+      totalItems: totalItems,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
 exports.getVocab = (req, res, next) => {
