@@ -10,9 +10,10 @@ router.get("/vocabs", isAuth, vocabController.getVocabs);
 router.get("/vocab/:vocabId", vocabController.getVocab);
 router.post(
   "/vocab",
+  isAuth,
   [
-    body("title").trim().isLength({ min: 2 }),
-    body("meaning").trim().isLength({ min: 5 }),
+    body("title").trim().isLength({ min: 1 }),
+    body("meaning").trim().isLength({ min: 1 }),
   ],
   vocabController.postVocab
 );
