@@ -101,7 +101,7 @@ exports.forgotPassword = async (req, res, next) => {
       createdAt: Date.now(),
     }).save();
 
-    const link = `http://localhost:4200/reset-password?token=${resetToken}&id=${user._id}`;
+    const link = `${process.env.FE_URL}/reset-password?token=${resetToken}&id=${user._id}`;
 
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
@@ -112,19 +112,12 @@ exports.forgotPassword = async (req, res, next) => {
       html: `<p>You requested a password reset</p><a href="${link}">Reset Password</a>`,
     };
 
-    // for testing
-    // sgMail
-    //   .send(msg)
-    //   .then((response) => {
-    //     console.log(response[0].statusCode);
-    //     console.log(response[0].headers);
-    //   })
-    //   .catch((error) => {
-    //     console.error(error);
-    //     next(error);
-    //   });
-
-    res.status(200).json({ message: "success", url: link });
+    if (process.env.SEND_EMAIL || process.env.SEND_EMAIL === "true") {
+      await sgMail.send(msg);
+      res.status(200).json({ message: "success" });
+    } else {
+      res.status(200).json({ message: "success", url: link });
+    }
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;

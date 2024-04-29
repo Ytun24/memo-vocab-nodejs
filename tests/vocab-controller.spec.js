@@ -79,17 +79,6 @@ describe("Vocab Controller", () => {
     const mockedReq = {};
     const mockedRes = mockRes();
 
-    const mockVocabFindRes = [
-      {
-        id: "1",
-        title: "mock title 1",
-      },
-      {
-        id: "2",
-        title: "mock title 2",
-      },
-    ];
-
     const VocabMock = {
       find: jest.fn(() => VocabMock),
       limit: jest.fn(() => []),
