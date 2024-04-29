@@ -409,4 +409,111 @@ describe("AuthController", () => {
     expect(mockedNext.mock.calls[0][0].message).toBe("email send error");
   });
 
+  test("[resetPassword] should send success response with status 200", async () => {
+    // given
+    const mockedNext = jest.fn();
+    const mockedReq = {
+      body: {
+        password: "password",
+        resetToken: "resettoken",
+        userId: "userid",
+      },
+    };
+    const mockedRes = mockRes();
+
+    jest
+      .spyOn(validator, "validationResult")
+      .mockReturnValue({ isEmpty: () => true, array: () => [] });
+    User.findById.mockImplementation(() => ({
+      save: jest.fn(() => {}),
+    }));
+    Token.findOne.mockImplementation(() => ({
+      deleteOne: jest.fn(() => {}),
+    }));
+    bcrypt.compare.mockReturnValue(true);
+    bcrypt.hash.mockResolvedValue("testhasing");
+
+    // when
+    await authController.resetPassword(mockedReq, mockedRes, mockedNext);
+
+    // then
+    expect(mockedRes.status).toHaveBeenCalledWith(200);
+    expect(mockedRes.json).toHaveBeenCalledWith({
+      message: "success",
+    });
+  });
+
+  test("[resetPassword] should send error to next middleware when validation error is not empty", async () => {
+    const mockedNext = jest.fn();
+    const mockedReq = {};
+    const mockedRes = mockRes();
+
+    jest
+      .spyOn(validator, "validationResult")
+      .mockReturnValue({ isEmpty: () => false, array: () => [] });
+
+    await authController.resetPassword(mockedReq, mockedRes, mockedNext);
+
+    expect(mockedNext.mock.calls[0][0].statusCode).toBe(422);
+    expect(mockedNext.mock.calls[0][0].message).toBe("Invalid input");
+  });
+
+  test("[resetPassword] should send error to next middleware when token is not exist", async () => {
+    const mockedNext = jest.fn();
+    const mockedReq = {};
+    const mockedRes = mockRes();
+
+    jest
+      .spyOn(validator, "validationResult")
+      .mockReturnValue({ isEmpty: () => true, array: () => [] });
+    Token.findOne.mockResolvedValue(null);
+
+    await authController.resetPassword(mockedReq, mockedRes, mockedNext);
+
+    expect(mockedNext.mock.calls[0][0].statusCode).toBe(500);
+    expect(mockedNext.mock.calls[0][0].message).toBe("Invalid token!");
+  });
+
+  test("[resetPassword] should send error to next middleware when token is not valid", async () => {
+    const mockedNext = jest.fn();
+    const mockedReq = {};
+    const mockedRes = mockRes();
+
+    jest
+      .spyOn(validator, "validationResult")
+      .mockReturnValue({ isEmpty: () => true, array: () => [] });
+    Token.findOne.mockResolvedValue({
+      _id: 1,
+      token: "mocktoken",
+      userId: "1",
+    });
+    bcrypt.compare.mockResolvedValue(false);
+
+    await authController.resetPassword(mockedReq, mockedRes, mockedNext);
+
+    expect(mockedNext.mock.calls[0][0].statusCode).toBe(500);
+    expect(mockedNext.mock.calls[0][0].message).toBe("Invalid token!");
+  });
+
+  test("[resetPassword] should send error to next middleware when user is not exist", async () => {
+    const mockedNext = jest.fn();
+    const mockedReq = {};
+    const mockedRes = mockRes();
+
+    jest
+      .spyOn(validator, "validationResult")
+      .mockReturnValue({ isEmpty: () => true, array: () => [] });
+    Token.findOne.mockResolvedValue({
+      _id: 1,
+      token: "mocktoken",
+      userId: "1",
+    });
+    bcrypt.compare.mockResolvedValue(true);
+    User.findById.mockResolvedValue(null);
+
+    await authController.resetPassword(mockedReq, mockedRes, mockedNext);
+
+    expect(mockedNext.mock.calls[0][0].statusCode).toBe(500);
+    expect(mockedNext.mock.calls[0][0].message).toBe("Invalid user");
+  });
 });

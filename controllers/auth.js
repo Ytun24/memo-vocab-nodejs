@@ -127,15 +127,24 @@ exports.forgotPassword = async (req, res, next) => {
 };
 
 exports.resetPassword = async (req, res, next) => {
+  const newPassword = req.body?.password;
+  const resetToken = req.body?.resetToken;
+  const userId = req.body?.userId;
+
   try {
-    const newPassword = req.body.password;
-    const resetToken = req.body.resetToken;
-    const userId = req.body.userId;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      console.log("validation result: ", errors.array());
+      const error = new Error("Invalid input");
+      error.statusCode = 422;
+      throw error;
+    }
+
     const token = await Token.findOne({ userId: userId });
     if (!token) throw new Error("Invalid token!");
 
     const isEqual = await bcrypt.compare(resetToken, token.token);
-    if (!isEqual) throw new Error("Invalid token! 2");
+    if (!isEqual) throw new Error("Invalid token!");
 
     let user = await User.findById(userId);
     if (!user) throw new Error("Invalid user");

@@ -32,6 +32,15 @@ router.post(
   authController.login
 );
 router.post("/forgot-password", authController.forgotPassword);
-router.post("/reset-password", authController.resetPassword);
+router.post(
+  "/reset-password",
+  [
+    body("password").isLength({ min: 5 }),
+    body("confirmPassword").custom((value, { req }) => {
+      return value === req.body.password;
+    }),
+  ],
+  authController.resetPassword
+);
 
 module.exports = router;
